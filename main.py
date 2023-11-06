@@ -1,6 +1,10 @@
+
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 import streamlit as st
 import streamlit_authenticator as stauth
+from PIL import Image
 
 hashed_passwords = stauth.Hasher(['letmein', 'ftTakeHome']).generate()
 import yaml
@@ -65,11 +69,36 @@ A forecast model is generated from the polling averages and applied to the elect
     st.markdown("""The forecast model will give a likelihood and error for each race, alongside the overall confidence in the outcome. Confidence intervals will be shown on the poll tracker. There will be interactive elements to allow to filter out pollsters by methodology or overall quality or limit to the most recent polls to allow for readers to explore possible outcomes. 
 
 Probable outcomes are shown by distribution of simulated outcomes for the given options selected by the reader. """)
+    polling_data = pd.read_csv("data.csv")
 
+    cons_n_lab = polling_data[['house', 'sdate', 'con', 'lab', 'lib']]
+
+    long = pd.melt(cons_n_lab, id_vars=['house', 'sdate'], value_vars=['con', 'lab', 'lib'])
+    long.columns = ['house', '2019', 'party', 'polling']
+    long = long.loc[long['2019'].str.startswith('2019', na=False)]
+    mrp = st.checkbox('MRP Polls Only')
+    if mrp:
+        long = long[long['house'] == 'YouGov']
+
+    most_recent = st.checkbox('Show most recent polls')
+    if most_recent:
+        long = long[long['2019'].str.startswith('2019-12', na=False)]
+    poll_plot = plt.figure(figsize=(10, 4))
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    sns.lineplot(data=long, x="2019", y="polling", hue="party", palette=['b', 'r', 'y'])
+    st.pyplot(poll_plot)
     st.subheader("Live Results")
     st.markdown(
         "Visualising the probable outcome of uncalled races is essential in giving readers an insight into what the probable results are likely to be. Using an updated forecast model adjusting the weighting for polling performance against predicted, we can show called races and probable outcomes of the yet-to-be-called races.")
 
+    results_option = st.selectbox('Would you like to see called races, predicted or both?',
+                                  ('Called', 'Predicted', 'All'))
+    image_dict = {'Called': 'called_seats.png',
+                  'Predicted': 'predicted_seats.png',
+                  'All': 'all_seats.png'}
+
+    image = Image.open(image_dict[results_option])
+    st.image(image, caption='NB: In predicted seats the opacity is how certain we are of a result')
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
