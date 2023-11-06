@@ -36,7 +36,7 @@ if authentication_status:
     df.reset_index(inplace=True)
     st.markdown(df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
-    st.header("Current Situation")
+    st.header("Competitor Analysis")
 
     st.subheader("FT")
     st.markdown(
@@ -91,11 +91,11 @@ Probable outcomes are shown by distribution of simulated outcomes for the given 
     st.markdown(
         "Visualising the probable outcome of uncalled races is essential in giving readers an insight into what the probable results are likely to be. Using an updated forecast model adjusting the weighting for polling performance against predicted, we can show called races and probable outcomes of the yet-to-be-called races.")
 
-    results_option = st.selectbox('Would you like to see called races, predicted or both?',
-                                  ('Called', 'Predicted', 'All'))
+    results_option = st.selectbox('Called races, predicted or both?',
+                                  ('Called', 'Predicted', 'Both'))
     image_dict = {'Called': 'called_seats.png',
                   'Predicted': 'predicted_seats.png',
-                  'All': 'all_seats.png'}
+                  'Both': 'all_seats.png'}
 
     image = Image.open(image_dict[results_option])
     st.image(image, caption='NB: In predicted seats the opacity is how certain we are of a result')
