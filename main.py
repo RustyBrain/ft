@@ -46,7 +46,7 @@ if authentication_status:
 
     st.markdown("Selected competitors and the extent they show probability and uncertainty in election coverage.")
 
-    df = pd.read_csv("FT competiton.csv")
+    df = pd.read_csv("FT competiton.csv", index_col=0)
     df.reset_index(inplace=True)
     st.markdown(df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
